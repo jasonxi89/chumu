@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { View, Text, ScrollView, Input, Textarea, Picker } from '@tarojs/components'
+import { View, Text, ScrollView, Input, Picker } from '@tarojs/components'
 import Taro, { usePullDownRefresh } from '@tarojs/taro'
 import FilterTabs from '@/components/FilterTabs'
 import BookingCard from '@/components/BookingCard'
@@ -16,14 +16,12 @@ const FILTER_TABS = [
   { key: 'cancelled', label: '已取消' },
 ]
 
-const DURATION_OPTIONS = [30, 60, 90, 120]
-const DURATION_LABELS = ['30 分钟', '60 分钟', '90 分钟', '120 分钟']
 const WEEKDAY_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
 interface BookingForm {
   date: string
   startTime: string
-  durationIndex: number
+  endTime: string
   serviceType: string
   customerName: string
   customerPhone: string
@@ -34,7 +32,7 @@ interface BookingForm {
 const INITIAL_FORM: BookingForm = {
   date: formatDate(new Date()),
   startTime: '10:00',
-  durationIndex: 1,
+  endTime: '11:00',
   serviceType: '',
   customerName: '',
   customerPhone: '',
@@ -57,29 +55,32 @@ export default function BookingsPage() {
 
   const groupedBookings = useMemo(() => groupByDate(bookings), [bookings])
 
+  function computeDuration(): number {
+    const [sh, sm] = form.startTime.split(':').map(Number)
+    const [eh, em] = form.endTime.split(':').map(Number)
+    return (eh * 60 + em) - (sh * 60 + sm)
+  }
+
   function handleSubmit() {
     if (!form.customerName.trim()) {
       Taro.showToast({ title: '请输入客户姓名', icon: 'none' })
       return
     }
-    if (!form.customerPhone.trim()) {
-      Taro.showToast({ title: '请输入手机号', icon: 'none' })
-      return
-    }
-    if (!form.customerWechat.trim()) {
-      Taro.showToast({ title: '请输入微信号', icon: 'none' })
+    const duration = computeDuration()
+    if (duration <= 0) {
+      Taro.showToast({ title: '结束时间须晚于开始时间', icon: 'none' })
       return
     }
 
     addBooking({
       date: form.date,
       start_time: form.startTime,
-      duration: DURATION_OPTIONS[form.durationIndex],
+      duration,
       service_type: form.serviceType || 'general',
       service_name: form.serviceType || '通用服务',
       customer_name: form.customerName.trim(),
-      customer_phone: form.customerPhone.trim(),
-      customer_wechat: form.customerWechat.trim(),
+      customer_phone: form.customerPhone.trim() || undefined,
+      customer_wechat: form.customerWechat.trim() || undefined,
       notes: form.notes.trim() || undefined,
     })
 
@@ -181,19 +182,16 @@ export default function BookingsPage() {
                 </Picker>
               </View>
 
-              {/* Duration */}
+              {/* End time */}
               <View className='form-field'>
-                <Text className='form-field__label'>时长</Text>
+                <Text className='form-field__label'>结束时间</Text>
                 <Picker
-                  mode='selector'
-                  range={DURATION_LABELS}
-                  value={form.durationIndex}
-                  onChange={(e) => updateField('durationIndex', Number(e.detail.value))}
+                  mode='time'
+                  value={form.endTime}
+                  onChange={(e) => updateField('endTime', e.detail.value)}
                 >
                   <View className='form-field__picker'>
-                    <Text className='form-field__picker-text'>
-                      {DURATION_LABELS[form.durationIndex]}
-                    </Text>
+                    <Text className='form-field__picker-text'>{form.endTime}</Text>
                   </View>
                 </Picker>
               </View>
@@ -212,7 +210,7 @@ export default function BookingsPage() {
 
               {/* Customer name */}
               <View className='form-field'>
-                <Text className='form-field__label'>客户姓名 *</Text>
+                <Text className='form-field__label'>客户姓名</Text>
                 <Input
                   className='form-field__input'
                   value={form.customerName}
@@ -224,12 +222,12 @@ export default function BookingsPage() {
 
               {/* Phone */}
               <View className='form-field'>
-                <Text className='form-field__label'>手机号 *</Text>
+                <Text className='form-field__label'>手机号</Text>
                 <Input
                   className='form-field__input'
                   type='number'
                   value={form.customerPhone}
-                  placeholder='请输入手机号'
+                  placeholder='选填'
                   placeholderClass='form-field__placeholder'
                   onInput={(e) => updateField('customerPhone', e.detail.value)}
                 />
@@ -237,11 +235,11 @@ export default function BookingsPage() {
 
               {/* WeChat */}
               <View className='form-field'>
-                <Text className='form-field__label'>微信号 *</Text>
+                <Text className='form-field__label'>微信号</Text>
                 <Input
                   className='form-field__input'
                   value={form.customerWechat}
-                  placeholder='请输入微信号'
+                  placeholder='选填'
                   placeholderClass='form-field__placeholder'
                   onInput={(e) => updateField('customerWechat', e.detail.value)}
                 />
@@ -250,12 +248,11 @@ export default function BookingsPage() {
               {/* Notes */}
               <View className='form-field'>
                 <Text className='form-field__label'>备注</Text>
-                <Textarea
-                  className='form-field__textarea'
+                <Input
+                  className='form-field__input'
                   value={form.notes}
-                  placeholder='可选，添加备注信息'
+                  placeholder='选填'
                   placeholderClass='form-field__placeholder'
-                  maxlength={200}
                   onInput={(e) => updateField('notes', e.detail.value)}
                 />
               </View>

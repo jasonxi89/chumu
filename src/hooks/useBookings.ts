@@ -13,8 +13,8 @@ interface NewBookingData {
   service_type: string
   service_name: string
   customer_name: string
-  customer_phone: string
-  customer_wechat: string
+  customer_phone?: string
+  customer_wechat?: string
   notes?: string
 }
 

@@ -2,7 +2,7 @@
   "miniprogramRoot": "dist/",
   "projectname": "chumu",
   "description": "初慕 - 日历预约",
-  "appid": "touristappid",
+  "appid": "wx4972413c3d9dbf26",
   "setting": {
     "urlCheck": false,
     "es6": false,
@@ -14,7 +14,20 @@
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true
   },
   "compileType": "miniprogram",
   "libVersion": "3.14.2",
@@ -27,5 +40,6 @@
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2
-  }
+  },
+  "simulatorPluginLibVersion": {}
 }
