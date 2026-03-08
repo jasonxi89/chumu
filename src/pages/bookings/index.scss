@@ -178,6 +178,7 @@
 // Form fields
 .form-field {
   margin-bottom: 24px;
+  overflow: hidden;
 
   &__label {
     display: block;
@@ -223,7 +224,6 @@
   }
 
   &__picker {
-    width: 100%;
     height: 80px;
     padding: 0 24px;
     border: 2px solid var(--color-border);
