@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Settings, TimeBlock, BlockedSlot, Booking } from '@/types'
+import { Settings, TimeBlock, TimeRow, BlockedSlot, Booking } from '@/types'
 import { isTimeOverlap } from '@/utils/time'
 import { getCollection } from '@/utils/cloud'
 
 interface DaySlotsResult {
-  blocks: TimeBlock[]
+  rows: TimeRow[]
   loading: boolean
   blockSlot: (startTime: string, endTime: string, reason?: string) => Promise<void>
   unblockSlot: (slotId: string) => Promise<void>
@@ -51,7 +51,7 @@ export function useDaySlots(
     fetchDayData()
   }, [fetchDayData])
 
-  const blocks = buildBlocks(settings, bookings, blockedSlots)
+  const rows = buildRows(settings, bookings, blockedSlots)
 
   async function blockSlot(startTime: string, endTime: string, reason?: string) {
     const newBlocked: BlockedSlot = {
@@ -61,14 +61,12 @@ export function useDaySlots(
       reason,
       created_at: new Date(),
     }
-
     try {
       const res = await getCollection('blocked_slots').add({ data: newBlocked } as any)
       newBlocked._id = (res as any)._id
     } catch {
       newBlocked._id = `local_${Date.now()}`
     }
-
     setBlockedSlots(prev => [...prev, newBlocked])
   }
 
@@ -81,26 +79,25 @@ export function useDaySlots(
     setBlockedSlots(prev => prev.filter(s => s._id !== slotId))
   }
 
-  return { blocks, loading, blockSlot, unblockSlot, refresh: fetchDayData }
+  return { rows, loading, blockSlot, unblockSlot, refresh: fetchDayData }
 }
 
-function buildBlocks(
+function buildRows(
   settings: Settings | null,
   bookings: Booking[],
   blockedSlots: BlockedSlot[]
-): TimeBlock[] {
+): TimeRow[] {
   if (!settings) return []
 
   const { business_hours } = settings
   const dayStart = business_hours.start
   const dayEnd = business_hours.end
 
-  // Build blocks directly from bookings and blocked slots
-  const occupiedBlocks: TimeBlock[] = []
+  // Build occupied blocks
+  const occupied: TimeBlock[] = []
 
-  // Add booking blocks
   for (const booking of bookings) {
-    occupiedBlocks.push({
+    occupied.push({
       startTime: clampTime(booking.start_time, dayStart, dayEnd),
       endTime: clampTime(booking.end_time, dayStart, dayEnd),
       status: 'booked',
@@ -108,9 +105,8 @@ function buildBlocks(
     })
   }
 
-  // Add blocked slot blocks
   for (const blocked of blockedSlots) {
-    occupiedBlocks.push({
+    occupied.push({
       startTime: clampTime(blocked.start_time, dayStart, dayEnd),
       endTime: clampTime(blocked.end_time, dayStart, dayEnd),
       status: 'blocked',
@@ -118,52 +114,81 @@ function buildBlocks(
     })
   }
 
-  // Sort by start time
-  occupiedBlocks.sort((a, b) => a.startTime.localeCompare(b.startTime))
+  occupied.sort((a, b) => a.startTime.localeCompare(b.startTime))
 
-  // Detect overlaps between booking blocks
-  for (let i = 0; i < occupiedBlocks.length; i++) {
-    for (let j = i + 1; j < occupiedBlocks.length; j++) {
-      const a = occupiedBlocks[i]
-      const b = occupiedBlocks[j]
-      if (a.status === 'booked' && b.status === 'booked' &&
-          isTimeOverlap(a.startTime, a.endTime, b.startTime, b.endTime)) {
-        a.hasOverlap = true
-        a.overlapWith = b.booking?.service_name
-        b.hasOverlap = true
-        b.overlapWith = a.booking?.service_name
+  // Group overlapping blocks
+  const groups: TimeBlock[][] = []
+  for (const block of occupied) {
+    let placed = false
+    for (const group of groups) {
+      if (group.some(b => isTimeOverlap(b.startTime, b.endTime, block.startTime, block.endTime))) {
+        group.push(block)
+        placed = true
+        break
       }
     }
+    if (!placed) {
+      groups.push([block])
+    }
   }
 
-  // Fill gaps with available blocks
-  const allBlocks: TimeBlock[] = []
+  // Convert groups to time rows + fill gaps with available
+  const rows: TimeRow[] = []
   let cursor = dayStart
 
-  for (const block of occupiedBlocks) {
-    if (block.startTime > cursor) {
-      allBlocks.push({
+  // Sort groups by earliest start time
+  groups.sort((a, b) => {
+    const aStart = a.reduce((min, bl) => bl.startTime < min ? bl.startTime : min, '99:99')
+    const bStart = b.reduce((min, bl) => bl.startTime < min ? bl.startTime : min, '99:99')
+    return aStart.localeCompare(bStart)
+  })
+
+  for (const group of groups) {
+    const groupStart = group.reduce((min, b) => b.startTime < min ? b.startTime : min, '99:99')
+    const groupEnd = group.reduce((max, b) => b.endTime > max ? b.endTime : max, '00:00')
+
+    // Fill gap before this group
+    if (groupStart > cursor) {
+      rows.push({
+        type: 'single',
         startTime: cursor,
-        endTime: block.startTime,
-        status: 'available',
+        endTime: groupStart,
+        blocks: [{ startTime: cursor, endTime: groupStart, status: 'available' }],
       })
     }
-    allBlocks.push(block)
-    if (block.endTime > cursor) {
-      cursor = block.endTime
+
+    if (group.length === 1) {
+      rows.push({
+        type: 'single',
+        startTime: groupStart,
+        endTime: groupEnd,
+        blocks: group,
+      })
+    } else {
+      rows.push({
+        type: 'overlap',
+        startTime: groupStart,
+        endTime: groupEnd,
+        blocks: group,
+      })
+    }
+
+    if (groupEnd > cursor) {
+      cursor = groupEnd
     }
   }
 
-  // Fill remaining time after last block
+  // Fill remaining
   if (cursor < dayEnd) {
-    allBlocks.push({
+    rows.push({
+      type: 'single',
       startTime: cursor,
       endTime: dayEnd,
-      status: 'available',
+      blocks: [{ startTime: cursor, endTime: dayEnd, status: 'available' }],
     })
   }
 
-  return allBlocks
+  return rows
 }
 
 function clampTime(time: string, min: string, max: string): string {

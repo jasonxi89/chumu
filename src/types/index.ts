@@ -57,6 +57,11 @@ export interface TimeBlock {
   status: 'available' | 'blocked' | 'booked'
   booking?: Booking
   blocked?: BlockedSlot
-  hasOverlap?: boolean
-  overlapWith?: string // service name of the other overlapping booking
+}
+
+export interface TimeRow {
+  type: 'single' | 'overlap'
+  startTime: string
+  endTime: string
+  blocks: TimeBlock[]
 }

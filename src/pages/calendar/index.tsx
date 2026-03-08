@@ -28,7 +28,7 @@ export default function CalendarPage() {
   const { markedDates, bookings, blockedSlots, refresh: refreshCalendar } =
     useCalendarData(currentMonth.getFullYear(), currentMonth.getMonth())
 
-  const { blocks, blockSlot, unblockSlot, refresh: refreshSlots } = useDaySlots(
+  const { rows, blockSlot, unblockSlot, refresh: refreshSlots } = useDaySlots(
     selectedDate,
     settings,
     bookings,
@@ -126,7 +126,7 @@ export default function CalendarPage() {
       >
         <TimeAxis
           date={selectedDate}
-          blocks={blocks}
+          rows={rows}
           onBlockTap={handleBlockTap}
         />
         <View className='calendar-page__timeline-bottom' />
