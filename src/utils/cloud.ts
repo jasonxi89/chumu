@@ -5,7 +5,10 @@ let initialized = false
 export function initCloud() {
   if (initialized) return
   if (Taro.cloud) {
-    Taro.cloud.init({ traceUser: true })
+    Taro.cloud.init({
+      env: 'cloudbase-6ghifx17984493dd',
+      traceUser: true,
+    })
     initialized = true
   }
 }
