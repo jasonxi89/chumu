@@ -1,13 +1,12 @@
 import { PropsWithChildren } from 'react'
 import { useLaunch } from '@tarojs/taro'
 import { initCloud } from './utils/cloud'
-// @ts-ignore
-import { version } from '../package.json'
+const APP_VERSION = '0.1.0'
 import './app.scss'
 
 function App({ children }: PropsWithChildren) {
   useLaunch(() => {
-    console.log(`[初慕] v${version}`)
+    console.log(`[初慕] v${APP_VERSION}`)
     initCloud()
   })
 
