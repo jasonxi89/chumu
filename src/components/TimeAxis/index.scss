@@ -87,7 +87,7 @@
 .time-axis__node--booked {
   background: var(--color-accent);
   border: 2px solid var(--color-accent);
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+  box-shadow: 0 0 8px rgba(232, 168, 56, 0.5);
 }
 
 // Slot card
@@ -117,7 +117,7 @@
 
 .time-axis__slot--booked {
   background: var(--color-accent-light);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(232, 168, 56, 0.3);
 }
 
 .time-axis__slot-inner {

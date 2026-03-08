@@ -1,11 +1,11 @@
 .filter-tabs {
   width: 100%;
   white-space: nowrap;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 
   &__track {
     display: inline-flex;
-    gap: 16px;
+    gap: 12px;
     padding: 4px 0;
   }
 
@@ -13,11 +13,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 32px;
-    border-radius: 40px;
-    border: 2px solid var(--color-text-muted);
-    background: transparent;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 14px 32px;
+    border-radius: var(--radius-full);
+    border: none;
+    background: var(--color-bg-elevated);
+    transition: all 0.25s ease;
     flex-shrink: 0;
 
     &:active {
@@ -26,20 +26,20 @@
 
     &--active {
       background: var(--color-accent);
-      border-color: var(--color-accent);
-      box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
+      box-shadow: var(--shadow-glow);
 
       .filter-tabs__label {
-        color: #0f172a;
-        font-weight: 600;
+        color: #0a0a0a;
+        font-weight: 700;
       }
     }
   }
 
   &__label {
     font-size: 26px;
-    color: var(--color-text-secondary);
-    transition: color 0.3s ease;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    transition: color 0.25s ease;
     line-height: 1.2;
   }
 }

@@ -75,7 +75,7 @@ function buildMarkedDates(
 
   for (const booking of bookings) {
     if (!marks[booking.date]) marks[booking.date] = []
-    const color = booking.status === 'confirmed' ? '#34d399' : '#fb923c'
+    const color = booking.status === 'confirmed' ? '#e8a838' : '#fb923c'
     if (marks[booking.date].length < 3) {
       marks[booking.date].push(color)
     }

@@ -115,7 +115,7 @@ export default function BookingCard({ booking, onCancel }: BookingCardProps) {
   )
 }
 
-const SERVICE_COLORS = ['#34d399', '#60a5fa', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c']
+const SERVICE_COLORS = ['#e8a838', '#60a5fa', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c']
 
 function getServiceColor(serviceType: string): string {
   let hash = 0

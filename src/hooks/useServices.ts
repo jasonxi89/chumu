@@ -6,7 +6,7 @@ const DEFAULT_SERVICES: Service[] = [
   {
     _id: 'default_1',
     name: '咨询服务',
-    color: '#34d399',
+    color: '#e8a838',
     duration_options: [30, 60],
     is_active: true,
     created_at: new Date(),

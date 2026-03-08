@@ -11,7 +11,7 @@ import './index.scss'
 const INTERVAL_OPTIONS = [15, 30, 60]
 
 const COLOR_PALETTE = [
-  '#34d399', '#2dd4bf', '#22d3ee', '#60a5fa',
+  '#e8a838', '#2dd4bf', '#22d3ee', '#60a5fa',
   '#818cf8', '#a78bfa', '#e879f9', '#f472b6',
   '#fb923c', '#facc15', '#a3e635', '#f87171',
 ]
@@ -26,7 +26,7 @@ interface ServiceFormData {
 
 const EMPTY_FORM: ServiceFormData = {
   name: '',
-  color: '#34d399',
+  color: '#e8a838',
   duration_options: [30],
 }
 

@@ -6,14 +6,14 @@ export default defineAppConfig({
   ],
   window: {
     backgroundTextStyle: 'dark',
-    navigationBarBackgroundColor: '#0f172a',
+    navigationBarBackgroundColor: '#0a0a0a',
     navigationBarTitleText: '初慕',
     navigationBarTextStyle: 'white',
   },
   tabBar: {
-    color: '#94a3b8',
-    selectedColor: '#34d399',
-    backgroundColor: '#0f172a',
+    color: '#6b6560',
+    selectedColor: '#e8a838',
+    backgroundColor: '#0a0a0a',
     borderStyle: 'black',
     list: [
       { pagePath: 'pages/calendar/index', text: '日历' },

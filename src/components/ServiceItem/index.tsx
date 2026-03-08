@@ -93,7 +93,7 @@ export default function ServiceItem({ service, onToggle, onDelete, onEdit }: Ser
           <Switch
             checked={service.is_active}
             onChange={handleToggle}
-            color='#34d399'
+            color='#e8a838'
             className='service-item__switch'
           />
         </View>
