@@ -152,6 +152,27 @@
     opacity: 0.8;
   }
 
+  &__confirm-btn {
+    margin-top: 20px;
+    padding: 18px 0;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-glow);
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &__confirm-text {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0a0a0a;
+  }
+
   &__cancel-btn {
     margin-top: 20px;
     padding: 18px 0;

@@ -133,6 +133,20 @@ export function useBookings(filter: BookingFilter) {
     fetchBookings()
   }, [fetchBookings])
 
+  const confirmBooking = useCallback(async (id: string) => {
+    try {
+      await getCollection('bookings').doc(id).update({
+        data: { status: 'confirmed' },
+      })
+    } catch {
+      console.warn('Cloud update failed, updating locally')
+    }
+    setAllBookings(prev =>
+      prev.map(b => (b._id === id ? { ...b, status: 'confirmed' as const } : b))
+    )
+    Taro.showToast({ title: '已确认', icon: 'none' })
+  }, [])
+
   const cancelBooking = useCallback(async (id: string) => {
     try {
       await getCollection('bookings').doc(id).update({
@@ -173,6 +187,7 @@ export function useBookings(filter: BookingFilter) {
     bookings: filteredBookings,
     loading,
     refresh: fetchBookings,
+    confirmBooking,
     cancelBooking,
     addBooking,
   }

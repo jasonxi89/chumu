@@ -7,6 +7,7 @@ import './index.scss'
 interface BookingCardProps {
   booking: Booking
   onCancel?: (id: string) => void
+  onConfirm?: (id: string) => void
 }
 
 const STATUS_CONFIG = {
@@ -15,7 +16,7 @@ const STATUS_CONFIG = {
   cancelled: { label: '已取消', className: 'status--cancelled' },
 }
 
-export default function BookingCard({ booking, onCancel }: BookingCardProps) {
+export default function BookingCard({ booking, onCancel, onConfirm }: BookingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const statusInfo = STATUS_CONFIG[booking.status]
   const isCancellable = booking.status === 'pending' || booking.status === 'confirmed'
@@ -99,6 +100,15 @@ export default function BookingCard({ booking, onCancel }: BookingCardProps) {
           <View className='booking-card__detail-row booking-card__detail-row--notes'>
             <Text className='booking-card__detail-label'>备注</Text>
             <Text className='booking-card__detail-value'>{booking.notes}</Text>
+          </View>
+        )}
+
+        {booking.status === 'pending' && onConfirm && (
+          <View
+            className='booking-card__confirm-btn'
+            onClick={(e) => { e.stopPropagation(); onConfirm(booking._id!) }}
+          >
+            <Text className='booking-card__confirm-text'>确认预约</Text>
           </View>
         )}
 

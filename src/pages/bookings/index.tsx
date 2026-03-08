@@ -44,7 +44,7 @@ export default function BookingsPage() {
   const [filter, setFilter] = useState('all')
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [form, setForm] = useState<BookingForm>({ ...INITIAL_FORM })
-  const { bookings, loading, refresh, cancelBooking, addBooking } = useBookings(
+  const { bookings, loading, refresh, confirmBooking, cancelBooking, addBooking } = useBookings(
     filter as 'all' | 'pending' | 'confirmed' | 'cancelled'
   )
 
@@ -132,6 +132,7 @@ export default function BookingsPage() {
                 <BookingCard
                   key={booking._id}
                   booking={booking}
+                  onConfirm={confirmBooking}
                   onCancel={cancelBooking}
                 />
               ))}
@@ -207,7 +208,7 @@ export default function BookingsPage() {
                   <Input
                     className='form-field__input'
                     value={form.serviceType}
-                    placeholder='如：咨询服务、设计评审'
+                    placeholder='如：面部护理、美甲设计'
                     placeholderClass='form-field__placeholder'
                     onInput={(e) => updateField('serviceType', e.detail.value)}
                   />
