@@ -57,4 +57,6 @@ export interface TimeBlock {
   status: 'available' | 'blocked' | 'booked'
   booking?: Booking
   blocked?: BlockedSlot
+  hasOverlap?: boolean
+  overlapWith?: string // service name of the other overlapping booking
 }

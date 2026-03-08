@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Settings, TimeBlock, BlockedSlot, Booking } from '@/types'
-import { generateTimeSlots, addMinutes, isTimeOverlap } from '@/utils/time'
+import { isTimeOverlap } from '@/utils/time'
 import { getCollection } from '@/utils/cloud'
 
 interface DaySlotsResult {
@@ -91,84 +91,83 @@ function buildBlocks(
 ): TimeBlock[] {
   if (!settings) return []
 
-  const { business_hours, time_slot_interval } = settings
-  const times = generateTimeSlots(
-    business_hours.start,
-    business_hours.end,
-    time_slot_interval
-  )
+  const { business_hours } = settings
+  const dayStart = business_hours.start
+  const dayEnd = business_hours.end
 
-  // Build individual slots first
-  const slots = times.map(time => {
-    const endTime = addMinutes(time, time_slot_interval)
+  // Build blocks directly from bookings and blocked slots
+  const occupiedBlocks: TimeBlock[] = []
 
-    const matchedBlocked = blockedSlots.find(s =>
-      isTimeOverlap(time, endTime, s.start_time, s.end_time)
-    )
-    if (matchedBlocked) {
-      return { time, endTime, status: 'blocked' as const, blocked: matchedBlocked }
-    }
+  // Add booking blocks
+  for (const booking of bookings) {
+    occupiedBlocks.push({
+      startTime: clampTime(booking.start_time, dayStart, dayEnd),
+      endTime: clampTime(booking.end_time, dayStart, dayEnd),
+      status: 'booked',
+      booking,
+    })
+  }
 
-    const matchedBooking = bookings.find(b =>
-      isTimeOverlap(time, endTime, b.start_time, b.end_time)
-    )
-    if (matchedBooking) {
-      return { time, endTime, status: 'booked' as const, booking: matchedBooking }
-    }
+  // Add blocked slot blocks
+  for (const blocked of blockedSlots) {
+    occupiedBlocks.push({
+      startTime: clampTime(blocked.start_time, dayStart, dayEnd),
+      endTime: clampTime(blocked.end_time, dayStart, dayEnd),
+      status: 'blocked',
+      blocked,
+    })
+  }
 
-    return { time, endTime, status: 'available' as const }
-  })
+  // Sort by start time
+  occupiedBlocks.sort((a, b) => a.startTime.localeCompare(b.startTime))
 
-  // Merge consecutive same-status slots into blocks
-  const blocks: TimeBlock[] = []
-  let i = 0
-
-  while (i < slots.length) {
-    const current = slots[i]
-
-    if (current.status === 'available') {
-      // Merge consecutive available slots
-      let end = i
-      while (end + 1 < slots.length && slots[end + 1].status === 'available') {
-        end++
+  // Detect overlaps between booking blocks
+  for (let i = 0; i < occupiedBlocks.length; i++) {
+    for (let j = i + 1; j < occupiedBlocks.length; j++) {
+      const a = occupiedBlocks[i]
+      const b = occupiedBlocks[j]
+      if (a.status === 'booked' && b.status === 'booked' &&
+          isTimeOverlap(a.startTime, a.endTime, b.startTime, b.endTime)) {
+        a.hasOverlap = true
+        a.overlapWith = b.booking?.service_name
+        b.hasOverlap = true
+        b.overlapWith = a.booking?.service_name
       }
-      blocks.push({
-        startTime: current.time,
-        endTime: slots[end].endTime,
-        status: 'available',
-      })
-      i = end + 1
-    } else if (current.status === 'booked' && current.booking) {
-      // Use the booking's actual time range, skip all slots covered by this booking
-      const booking = current.booking
-      blocks.push({
-        startTime: booking.start_time,
-        endTime: booking.end_time,
-        status: 'booked',
-        booking,
-      })
-      // Skip all slots that overlap with this booking
-      while (i < slots.length && slots[i].booking?._id === booking._id) {
-        i++
-      }
-    } else if (current.status === 'blocked' && current.blocked) {
-      // Merge consecutive slots with same blocked entry
-      const blocked = current.blocked
-      let end = i
-      while (end + 1 < slots.length && slots[end + 1].blocked?._id === blocked._id) {
-        end++
-      }
-      blocks.push({
-        startTime: blocked.start_time,
-        endTime: blocked.end_time,
-        status: 'blocked',
-        blocked,
-      })
-      i = end + 1
-    } else {
-      i++
     }
   }
 
-  return blocks
+  // Fill gaps with available blocks
+  const allBlocks: TimeBlock[] = []
+  let cursor = dayStart
+
+  for (const block of occupiedBlocks) {
+    if (block.startTime > cursor) {
+      allBlocks.push({
+        startTime: cursor,
+        endTime: block.startTime,
+        status: 'available',
+      })
+    }
+    allBlocks.push(block)
+    if (block.endTime > cursor) {
+      cursor = block.endTime
+    }
+  }
+
+  // Fill remaining time after last block
+  if (cursor < dayEnd) {
+    allBlocks.push({
+      startTime: cursor,
+      endTime: dayEnd,
+      status: 'available',
+    })
+  }
+
+  return allBlocks
+}
+
+function clampTime(time: string, min: string, max: string): string {
+  if (time < min) return min
+  if (time > max) return max
+  return time
 }

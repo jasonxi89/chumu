@@ -22,7 +22,7 @@ export default function TimeAxis({ date, blocks, onBlockTap }: TimeAxisProps) {
       {blocks.map((block, index) => (
         <View
           key={`${date}-${block.startTime}-${block.status}`}
-          className={`time-block time-block--${block.status}`}
+          className={`time-block time-block--${block.status}${block.hasOverlap ? ' time-block--overlap' : ''}`}
           onClick={() => onBlockTap(block)}
           style={{ animationDelay: `${index * 50}ms` }}
         >
@@ -42,6 +42,13 @@ export default function TimeAxis({ date, blocks, onBlockTap }: TimeAxisProps) {
 
             {block.status === 'booked' && block.booking && (
               <View className='time-block__inner'>
+                {block.hasOverlap && (
+                  <View className='time-block__overlap-tag'>
+                    <Text className='time-block__overlap-text'>
+                      时间冲突 · {block.overlapWith}
+                    </Text>
+                  </View>
+                )}
                 <Text className='time-block__service'>{block.booking.service_name}</Text>
                 <Text className='time-block__customer'>{block.booking.customer_name}</Text>
                 <View className={`time-block__badge time-block__badge--${block.booking.status}`}>
