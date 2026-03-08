@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { View, Text, ScrollView, Input, Picker } from '@tarojs/components'
-import Taro, { usePullDownRefresh } from '@tarojs/taro'
+import Taro, { usePullDownRefresh, useDidShow } from '@tarojs/taro'
 import FilterTabs from '@/components/FilterTabs'
 import BookingCard from '@/components/BookingCard'
 import EmptyState from '@/components/EmptyState'
@@ -51,6 +51,21 @@ export default function BookingsPage() {
   usePullDownRefresh(async () => {
     await refresh()
     Taro.stopPullDownRefresh()
+  })
+
+  // Check for prefill from calendar page
+  useDidShow(() => {
+    const prefill = Taro.getStorageSync('prefill_booking')
+    if (prefill) {
+      Taro.removeStorageSync('prefill_booking')
+      setForm(prev => ({
+        ...prev,
+        date: prefill.date || prev.date,
+        startTime: prefill.startTime || prev.startTime,
+        endTime: prefill.endTime || prev.endTime,
+      }))
+      setIsSheetOpen(true)
+    }
   })
 
   const groupedBookings = useMemo(() => groupByDate(bookings), [bookings])

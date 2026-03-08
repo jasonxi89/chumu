@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { View, Text, ScrollView, Input } from '@tarojs/components'
+import Taro from '@tarojs/taro'
 import Calendar from '@/components/Calendar'
 import TimeAxis from '@/components/TimeAxis'
 import ActionSheet from '@/components/ActionSheet'
@@ -7,7 +8,7 @@ import { useSettings } from '@/hooks/useSettings'
 import { useCalendarData } from '@/hooks/useCalendarData'
 import { useDaySlots } from '@/hooks/useDaySlots'
 import { formatDate } from '@/utils/time'
-import { TimeSlot } from '@/types'
+import { TimeBlock } from '@/types'
 import './index.scss'
 
 const WEEKDAY_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -18,7 +19,7 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
   )
-  const [activeSlot, setActiveSlot] = useState<TimeSlot | null>(null)
+  const [activeBlock, setActiveBlock] = useState<TimeBlock | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [blockReason, setBlockReason] = useState('')
 
@@ -27,34 +28,46 @@ export default function CalendarPage() {
   const { markedDates, bookings, blockedSlots, refresh: refreshCalendar } =
     useCalendarData(currentMonth.getFullYear(), currentMonth.getMonth())
 
-  const { slots, blockSlot, unblockSlot } = useDaySlots(
+  const { blocks, blockSlot, unblockSlot } = useDaySlots(
     selectedDate,
     settings,
     bookings,
     blockedSlots
   )
 
-  function handleSlotTap(slot: TimeSlot) {
-    setActiveSlot(slot)
+  function handleBlockTap(block: TimeBlock) {
+    if (block.status === 'available') {
+      // Navigate to bookings page with pre-filled time
+      Taro.switchTab({ url: '/pages/bookings/index' })
+      // Store params for bookings page to pick up
+      Taro.setStorageSync('prefill_booking', {
+        date: selectedDate,
+        startTime: block.startTime,
+        endTime: block.endTime,
+      })
+      return
+    }
+
+    setActiveBlock(block)
     setBlockReason('')
     setIsSheetOpen(true)
   }
 
   function closeSheet() {
     setIsSheetOpen(false)
-    setActiveSlot(null)
+    setActiveBlock(null)
   }
 
   async function handleBlockSlot() {
-    if (!activeSlot) return
-    await blockSlot(activeSlot.time, activeSlot.endTime, blockReason || undefined)
+    if (!activeBlock) return
+    await blockSlot(activeBlock.startTime, activeBlock.endTime, blockReason || undefined)
     refreshCalendar()
     closeSheet()
   }
 
   async function handleUnblockSlot() {
-    if (!activeSlot?.blocked?._id) return
-    await unblockSlot(activeSlot.blocked._id)
+    if (!activeBlock?.blocked?._id) return
+    await unblockSlot(activeBlock.blocked._id)
     refreshCalendar()
     closeSheet()
   }
@@ -71,12 +84,10 @@ export default function CalendarPage() {
   }
 
   function getSheetTitle(): string {
-    if (!activeSlot) return ''
-    switch (activeSlot.status) {
-      case 'available':
-        return `${activeSlot.time} - ${activeSlot.endTime}`
+    if (!activeBlock) return ''
+    switch (activeBlock.status) {
       case 'blocked':
-        return '已屏蔽时段'
+        return `已屏蔽 ${activeBlock.startTime} - ${activeBlock.endTime}`
       case 'booked':
         return '预约详情'
       default:
@@ -110,8 +121,8 @@ export default function CalendarPage() {
       >
         <TimeAxis
           date={selectedDate}
-          slots={slots}
-          onSlotTap={handleSlotTap}
+          blocks={blocks}
+          onBlockTap={handleBlockTap}
         />
         <View className='calendar-page__timeline-bottom' />
       </ScrollView>
@@ -121,31 +132,13 @@ export default function CalendarPage() {
         onClose={closeSheet}
         title={getSheetTitle()}
       >
-        {activeSlot?.status === 'available' && (
+        {activeBlock?.status === 'blocked' && (
           <View className='sheet-body'>
-            <Text className='sheet-body__hint'>
-              屏蔽后该时段将无法被预约
-            </Text>
-            <Input
-              className='sheet-body__input'
-              placeholder='屏蔽原因（选填）'
-              placeholderClass='sheet-body__input-placeholder'
-              value={blockReason}
-              onInput={e => setBlockReason(e.detail.value)}
-            />
-            <View className='sheet-body__btn sheet-body__btn--danger' onClick={handleBlockSlot}>
-              <Text className='sheet-body__btn-text'>屏蔽此时段</Text>
-            </View>
-          </View>
-        )}
-
-        {activeSlot?.status === 'blocked' && (
-          <View className='sheet-body'>
-            {activeSlot.blocked?.reason && (
+            {activeBlock.blocked?.reason && (
               <View className='sheet-body__detail-row'>
                 <Text className='sheet-body__detail-label'>原因</Text>
                 <Text className='sheet-body__detail-value'>
-                  {activeSlot.blocked.reason}
+                  {activeBlock.blocked.reason}
                 </Text>
               </View>
             )}
@@ -155,43 +148,43 @@ export default function CalendarPage() {
           </View>
         )}
 
-        {activeSlot?.status === 'booked' && (
+        {activeBlock?.status === 'booked' && (
           <View className='sheet-body'>
             <View className='sheet-body__detail-row'>
               <Text className='sheet-body__detail-label'>服务</Text>
               <Text className='sheet-body__detail-value'>
-                {activeSlot.booking?.service_name}
+                {activeBlock.booking?.service_name}
               </Text>
             </View>
             <View className='sheet-body__detail-row'>
               <Text className='sheet-body__detail-label'>客户</Text>
               <Text className='sheet-body__detail-value'>
-                {activeSlot.booking?.customer_name}
+                {activeBlock.booking?.customer_name}
               </Text>
             </View>
             <View className='sheet-body__detail-row'>
               <Text className='sheet-body__detail-label'>电话</Text>
               <Text className='sheet-body__detail-value'>
-                {activeSlot.booking?.customer_phone}
+                {activeBlock.booking?.customer_phone}
               </Text>
             </View>
             <View className='sheet-body__detail-row'>
               <Text className='sheet-body__detail-label'>时间</Text>
               <Text className='sheet-body__detail-value'>
-                {activeSlot.time} - {activeSlot.endTime}
+                {activeBlock.startTime} - {activeBlock.endTime}
               </Text>
             </View>
-            {activeSlot.booking?.notes && (
+            {activeBlock.booking?.notes && (
               <View className='sheet-body__detail-row'>
                 <Text className='sheet-body__detail-label'>备注</Text>
                 <Text className='sheet-body__detail-value'>
-                  {activeSlot.booking.notes}
+                  {activeBlock.booking.notes}
                 </Text>
               </View>
             )}
             <View className='sheet-body__status-badge'>
               <Text className='sheet-body__status-text'>
-                {activeSlot.booking?.status === 'confirmed' ? '已确认' : '待确认'}
+                {activeBlock.booking?.status === 'confirmed' ? '已确认' : '待确认'}
               </Text>
             </View>
           </View>

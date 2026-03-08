@@ -50,3 +50,11 @@ export interface TimeSlot {
   booking?: Booking
   blocked?: BlockedSlot
 }
+
+export interface TimeBlock {
+  startTime: string
+  endTime: string
+  status: 'available' | 'blocked' | 'booked'
+  booking?: Booking
+  blocked?: BlockedSlot
+}

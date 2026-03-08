@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Settings, TimeSlot, BlockedSlot, Booking } from '@/types'
+import { Settings, TimeBlock, BlockedSlot, Booking } from '@/types'
 import { generateTimeSlots, addMinutes, isTimeOverlap } from '@/utils/time'
 import { getCollection } from '@/utils/cloud'
 
 interface DaySlotsResult {
-  slots: TimeSlot[]
+  blocks: TimeBlock[]
   loading: boolean
   blockSlot: (startTime: string, endTime: string, reason?: string) => Promise<void>
   unblockSlot: (slotId: string) => Promise<void>
@@ -51,7 +51,7 @@ export function useDaySlots(
     fetchDayData()
   }, [fetchDayData])
 
-  const slots = buildSlots(settings, bookings, blockedSlots)
+  const blocks = buildBlocks(settings, bookings, blockedSlots)
 
   async function blockSlot(startTime: string, endTime: string, reason?: string) {
     const newBlocked: BlockedSlot = {
@@ -81,14 +81,14 @@ export function useDaySlots(
     setBlockedSlots(prev => prev.filter(s => s._id !== slotId))
   }
 
-  return { slots, loading, blockSlot, unblockSlot, refresh: fetchDayData }
+  return { blocks, loading, blockSlot, unblockSlot, refresh: fetchDayData }
 }
 
-function buildSlots(
+function buildBlocks(
   settings: Settings | null,
   bookings: Booking[],
   blockedSlots: BlockedSlot[]
-): TimeSlot[] {
+): TimeBlock[] {
   if (!settings) return []
 
   const { business_hours, time_slot_interval } = settings
@@ -98,7 +98,8 @@ function buildSlots(
     time_slot_interval
   )
 
-  return times.map(time => {
+  // Build individual slots first
+  const slots = times.map(time => {
     const endTime = addMinutes(time, time_slot_interval)
 
     const matchedBlocked = blockedSlots.find(s =>
@@ -117,4 +118,57 @@ function buildSlots(
 
     return { time, endTime, status: 'available' as const }
   })
+
+  // Merge consecutive same-status slots into blocks
+  const blocks: TimeBlock[] = []
+  let i = 0
+
+  while (i < slots.length) {
+    const current = slots[i]
+
+    if (current.status === 'available') {
+      // Merge consecutive available slots
+      let end = i
+      while (end + 1 < slots.length && slots[end + 1].status === 'available') {
+        end++
+      }
+      blocks.push({
+        startTime: current.time,
+        endTime: slots[end].endTime,
+        status: 'available',
+      })
+      i = end + 1
+    } else if (current.status === 'booked' && current.booking) {
+      // Use the booking's actual time range, skip all slots covered by this booking
+      const booking = current.booking
+      blocks.push({
+        startTime: booking.start_time,
+        endTime: booking.end_time,
+        status: 'booked',
+        booking,
+      })
+      // Skip all slots that overlap with this booking
+      while (i < slots.length && slots[i].booking?._id === booking._id) {
+        i++
+      }
+    } else if (current.status === 'blocked' && current.blocked) {
+      // Merge consecutive slots with same blocked entry
+      const blocked = current.blocked
+      let end = i
+      while (end + 1 < slots.length && slots[end + 1].blocked?._id === blocked._id) {
+        end++
+      }
+      blocks.push({
+        startTime: blocked.start_time,
+        endTime: blocked.end_time,
+        status: 'blocked',
+        blocked,
+      })
+      i = end + 1
+    } else {
+      i++
+    }
+  }
+
+  return blocks
 }
