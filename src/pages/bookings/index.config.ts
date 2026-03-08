@@ -1,0 +1,5 @@
+export default definePageConfig({
+  navigationBarTitleText: '预约列表',
+  enablePullDownRefresh: true,
+  backgroundTextStyle: 'dark',
+})
