@@ -27,11 +27,13 @@ export function addMinutes(time: string, minutes: number): string {
     h += Math.floor(m / 60)
     m = m % 60
   }
+  h = Math.min(h, 23)
   return formatTime(h, m)
 }
 
-export function isTimeInRange(time: string, start: string, end: string): boolean {
-  return time >= start && time < end
+export function formatDuration(minutes: number): string {
+  if (minutes >= 60 && minutes % 60 === 0) return `${minutes / 60}小时`
+  return `${minutes}分`
 }
 
 export function isTimeOverlap(

@@ -110,10 +110,6 @@ export function useBookings(filter: BookingFilter) {
 
   const filteredBookings = filterBookings(allBookings, filter)
 
-  useEffect(() => {
-    fetchBookings()
-  }, [])
-
   const fetchBookings = useCallback(async () => {
     setLoading(true)
     try {
@@ -135,6 +131,10 @@ export function useBookings(filter: BookingFilter) {
       setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    fetchBookings()
+  }, [fetchBookings])
 
   const cancelBooking = useCallback(async (id: string) => {
     try {

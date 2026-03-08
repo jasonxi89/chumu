@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import Taro from '@tarojs/taro'
 import { Settings } from '@/types'
 import { getCollection } from '@/utils/cloud'
 

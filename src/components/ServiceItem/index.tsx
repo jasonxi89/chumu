@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
-import { View, Text, Switch } from '@tarojs/components'
+import { View, Text, Switch, ITouchEvent } from '@tarojs/components'
 import { Service } from '@/types'
+import { formatDuration } from '@/utils/time'
 import './index.scss'
 
 interface ServiceItemProps {
@@ -17,12 +18,12 @@ export default function ServiceItem({ service, onToggle, onDelete, onEdit }: Ser
 
   const DELETE_THRESHOLD = 80
 
-  function handleTouchStart(event) {
+  function handleTouchStart(event: ITouchEvent) {
     startX.current = event.touches[0].clientX
     isDragging.current = false
   }
 
-  function handleTouchMove(event) {
+  function handleTouchMove(event: ITouchEvent) {
     const deltaX = event.touches[0].clientX - startX.current
     if (deltaX < -10) {
       isDragging.current = true
@@ -50,17 +51,13 @@ export default function ServiceItem({ service, onToggle, onDelete, onEdit }: Ser
     onEdit(service)
   }
 
-  function handleToggle(event) {
+  function handleToggle(event: { stopPropagation: () => void }) {
     event.stopPropagation()
     onToggle(service._id!, !service.is_active)
   }
 
   function handleDelete() {
     onDelete(service._id!)
-  }
-
-  function formatDuration(minutes: number): string {
-    return minutes >= 60 ? `${minutes / 60}h` : `${minutes}分`
   }
 
   return (

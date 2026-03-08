@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { View, Text, Input, Picker, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { Service } from '@/types'
+import { formatDuration } from '@/utils/time'
 import { useSettings } from '@/hooks/useSettings'
 import { useServices } from '@/hooks/useServices'
 import ServiceItem from '@/components/ServiceItem'
@@ -135,14 +136,6 @@ export default function SettingsPage() {
     })
   }
 
-  function formatDurationLabel(minutes: number): string {
-    if (minutes >= 60) {
-      const hours = minutes / 60
-      return Number.isInteger(hours) ? `${hours}小时` : `${minutes}分`
-    }
-    return `${minutes}分`
-  }
-
   if (!settings) return <View className='settings-page' />
 
   return (
@@ -247,7 +240,7 @@ export default function SettingsPage() {
                         onClick={() => handleToggleDuration(dur)}
                       >
                         <Text className={`duration-chips__text ${isSelected ? 'duration-chips__text--selected' : ''}`}>
-                          {formatDurationLabel(dur)}
+                          {formatDuration(dur)}
                         </Text>
                       </View>
                     )
