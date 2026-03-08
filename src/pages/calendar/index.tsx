@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { View, Text, ScrollView, Input } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import Calendar from '@/components/Calendar'
 import TimeAxis from '@/components/TimeAxis'
 import ActionSheet from '@/components/ActionSheet'
@@ -28,12 +28,17 @@ export default function CalendarPage() {
   const { markedDates, bookings, blockedSlots, refresh: refreshCalendar } =
     useCalendarData(currentMonth.getFullYear(), currentMonth.getMonth())
 
-  const { blocks, blockSlot, unblockSlot } = useDaySlots(
+  const { blocks, blockSlot, unblockSlot, refresh: refreshSlots } = useDaySlots(
     selectedDate,
     settings,
     bookings,
     blockedSlots
   )
+
+  useDidShow(() => {
+    refreshCalendar()
+    refreshSlots()
+  })
 
   function handleBlockTap(block: TimeBlock) {
     if (block.status === 'available') {
