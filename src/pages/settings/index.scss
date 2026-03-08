@@ -1,10 +1,348 @@
 .settings-page {
   min-height: 100vh;
-  padding: 24px;
+  background: var(--color-bg);
+
+  &__inner {
+    padding: 24px 28px;
+    padding-bottom: 0;
+  }
+
+  &__bottom-spacer {
+    height: 120px;
+  }
 }
 
-.page-title {
-  font-size: 48px;
-  font-weight: 700;
-  margin-bottom: 32px;
+// --- Section ---
+.section {
+  margin-bottom: 48px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  // When inside header, remove bottom margin (header handles it)
+  &__header &__title {
+    margin-bottom: 0;
+  }
+
+  &__action {
+    padding: 8px 24px;
+    background: var(--color-accent-light);
+    border-radius: 24px;
+  }
+
+  &__action-text {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  &--about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 0 24px;
+  }
+}
+
+// --- Card ---
+.card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 28px;
+    min-height: 96px;
+
+    &--stacked {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+
+  &__label {
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  &__value-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__value {
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  &__arrow {
+    font-size: 36px;
+    color: var(--color-text-muted);
+    margin-left: 4px;
+  }
+
+  &__divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0 28px;
+    opacity: 0.5;
+  }
+}
+
+// --- Segment Control ---
+.segment-control {
+  display: flex;
+  width: 100%;
+  background: var(--color-bg-elevated);
+  border-radius: 20px;
+  padding: 4px;
+
+  &__item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 0;
+    border-radius: 16px;
+    transition: background 0.25s ease;
+
+    &--active {
+      background: var(--color-accent);
+      box-shadow: 0 2px 8px rgba(52, 211, 153, 0.3);
+    }
+  }
+
+  &__text {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+
+    &--active {
+      color: #0f172a;
+    }
+  }
+}
+
+// --- Service Form ---
+.service-form {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+
+  &__field {
+    margin-bottom: 28px;
+
+    &:last-of-type {
+      margin-bottom: 32px;
+    }
+  }
+
+  &__label {
+    display: block;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  &__input {
+    width: 100%;
+    height: 80px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0 20px;
+    font-size: 30px;
+    color: var(--color-text-primary);
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: var(--color-accent);
+    }
+  }
+
+  &__placeholder {
+    color: var(--color-text-muted);
+  }
+
+  &__actions {
+    display: flex;
+    gap: 16px;
+  }
+
+  &__btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    border-radius: var(--radius-md);
+    transition: opacity 0.2s ease;
+
+    &:active {
+      opacity: 0.7;
+    }
+
+    &--save {
+      background: var(--color-accent);
+      box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
+    }
+
+    &--cancel {
+      background: var(--color-bg-elevated);
+    }
+  }
+
+  &__btn-text {
+    font-size: 28px;
+    font-weight: 600;
+
+    &--save {
+      color: #0f172a;
+    }
+
+    &--cancel {
+      color: var(--color-text-secondary);
+    }
+  }
+}
+
+// --- Color Palette ---
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  &__item {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &--selected {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px var(--color-bg-card), 0 0 0 6px currentColor;
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+
+  &__check {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// --- Duration Chips ---
+.duration-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  &__item {
+    padding: 12px 28px;
+    border-radius: 28px;
+    border: 2px solid var(--color-border);
+    background: transparent;
+    transition: all 0.2s ease;
+
+    &--selected {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      box-shadow: 0 2px 8px rgba(52, 211, 153, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &__text {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+
+    &--selected {
+      color: #0f172a;
+    }
+  }
+}
+
+// --- Service List ---
+.service-list {
+  margin-top: 4px;
+}
+
+// --- Empty State ---
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 0 48px;
+
+  &__icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  &__text {
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+  }
+
+  &__hint {
+    font-size: 24px;
+    color: var(--color-text-muted);
+  }
+}
+
+// --- About ---
+.about {
+  &__name {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+
+  &__desc {
+    font-size: 24px;
+    color: var(--color-text-muted);
+    opacity: 0.7;
+  }
 }
