@@ -1,3 +1,8 @@
+// Global box-sizing fix for WeChat native components
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 // Design Tokens
 page {
   --color-bg: #0f172a;

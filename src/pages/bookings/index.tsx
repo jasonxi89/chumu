@@ -199,62 +199,72 @@ export default function BookingsPage() {
               {/* Service type */}
               <View className='form-field'>
                 <Text className='form-field__label'>服务类型</Text>
-                <Input
-                  className='form-field__input'
-                  value={form.serviceType}
-                  placeholder='如：咨询服务、设计评审'
-                  placeholderClass='form-field__placeholder'
-                  onInput={(e) => updateField('serviceType', e.detail.value)}
-                />
+                <View className='form-field__input-wrap'>
+                  <Input
+                    className='form-field__input'
+                    value={form.serviceType}
+                    placeholder='如：咨询服务、设计评审'
+                    placeholderClass='form-field__placeholder'
+                    onInput={(e) => updateField('serviceType', e.detail.value)}
+                  />
+                </View>
               </View>
 
               {/* Customer name */}
               <View className='form-field'>
                 <Text className='form-field__label'>客户姓名</Text>
-                <Input
-                  className='form-field__input'
-                  value={form.customerName}
-                  placeholder='请输入客户姓名'
-                  placeholderClass='form-field__placeholder'
-                  onInput={(e) => updateField('customerName', e.detail.value)}
-                />
+                <View className='form-field__input-wrap'>
+                  <Input
+                    className='form-field__input'
+                    value={form.customerName}
+                    placeholder='请输入客户姓名'
+                    placeholderClass='form-field__placeholder'
+                    onInput={(e) => updateField('customerName', e.detail.value)}
+                  />
+                </View>
               </View>
 
               {/* Phone */}
               <View className='form-field'>
                 <Text className='form-field__label'>手机号</Text>
-                <Input
-                  className='form-field__input'
-                  type='number'
-                  value={form.customerPhone}
-                  placeholder='选填'
-                  placeholderClass='form-field__placeholder'
-                  onInput={(e) => updateField('customerPhone', e.detail.value)}
-                />
+                <View className='form-field__input-wrap'>
+                  <Input
+                    className='form-field__input'
+                    type='number'
+                    value={form.customerPhone}
+                    placeholder='选填'
+                    placeholderClass='form-field__placeholder'
+                    onInput={(e) => updateField('customerPhone', e.detail.value)}
+                  />
+                </View>
               </View>
 
               {/* WeChat */}
               <View className='form-field'>
                 <Text className='form-field__label'>微信号</Text>
-                <Input
-                  className='form-field__input'
-                  value={form.customerWechat}
-                  placeholder='选填'
-                  placeholderClass='form-field__placeholder'
-                  onInput={(e) => updateField('customerWechat', e.detail.value)}
-                />
+                <View className='form-field__input-wrap'>
+                  <Input
+                    className='form-field__input'
+                    value={form.customerWechat}
+                    placeholder='选填'
+                    placeholderClass='form-field__placeholder'
+                    onInput={(e) => updateField('customerWechat', e.detail.value)}
+                  />
+                </View>
               </View>
 
               {/* Notes */}
               <View className='form-field'>
                 <Text className='form-field__label'>备注</Text>
-                <Input
-                  className='form-field__input'
-                  value={form.notes}
-                  placeholder='选填'
-                  placeholderClass='form-field__placeholder'
-                  onInput={(e) => updateField('notes', e.detail.value)}
-                />
+                <View className='form-field__input-wrap'>
+                  <Input
+                    className='form-field__input'
+                    value={form.notes}
+                    placeholder='选填'
+                    placeholderClass='form-field__placeholder'
+                    onInput={(e) => updateField('notes', e.detail.value)}
+                  />
+                </View>
               </View>
 
               {/* Submit */}

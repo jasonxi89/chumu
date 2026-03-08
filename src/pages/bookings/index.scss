@@ -178,13 +178,6 @@
 // Form fields
 .form-field {
   margin-bottom: 24px;
-  overflow: hidden;
-
-  picker {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-  }
 
   &__label {
     display: block;
@@ -194,39 +187,25 @@
     margin-bottom: 12px;
   }
 
-  &__input {
-    width: 100%;
+  // 外层包裹 view 提供边框和 padding，input 本身不设宽度
+  &__input-wrap {
     height: 80px;
     padding: 0 24px;
     border: 2px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-bg);
-    color: var(--color-text-primary);
-    font-size: 28px;
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;
     transition: border-color 0.2s ease;
-
-    &:focus {
-      border-color: var(--color-accent);
-    }
   }
 
-  &__textarea {
+  &__input {
     width: 100%;
-    min-height: 160px;
-    padding: 20px 24px;
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-bg);
+    height: 100%;
+    background: transparent;
+    border: none;
     color: var(--color-text-primary);
     font-size: 28px;
-    box-sizing: border-box;
-    line-height: 1.5;
-    transition: border-color 0.2s ease;
-
-    &:focus {
-      border-color: var(--color-accent);
-    }
   }
 
   &__picker {
@@ -238,7 +217,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-sizing: border-box;
 
     &:active {
       border-color: var(--color-accent);
