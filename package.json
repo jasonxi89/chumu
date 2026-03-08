@@ -1,0 +1,59 @@
+{
+  "name": "chumu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "初慕 - 日历预约",
+  "templateInfo": {
+    "name": "default",
+    "typescript": true,
+    "css": "Sass",
+    "framework": "React"
+  },
+  "scripts": {
+    "build:weapp": "taro build --type weapp",
+    "dev:weapp": "npm run build:weapp -- --watch"
+  },
+  "browserslist": {
+    "development": [
+      "defaults and fully supports es6-module",
+      "maintained node versions"
+    ],
+    "production": [
+      "last 3 versions",
+      "Android >= 4.1",
+      "ios >= 8"
+    ]
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.24.4",
+    "@tarojs/components": "4.1.11",
+    "@tarojs/helper": "4.1.11",
+    "@tarojs/plugin-framework-react": "4.1.11",
+    "@tarojs/plugin-platform-weapp": "4.1.11",
+    "@tarojs/react": "4.1.11",
+    "@tarojs/runtime": "4.1.11",
+    "@tarojs/shared": "4.1.11",
+    "@tarojs/taro": "4.1.11",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.4",
+    "@babel/plugin-transform-class-properties": "7.25.9",
+    "@babel/preset-react": "^7.24.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
+    "@tarojs/cli": "4.1.11",
+    "@tarojs/taro-loader": "4.1.11",
+    "@tarojs/webpack5-runner": "4.1.11",
+    "@types/node": "^18",
+    "@types/react": "^18.0.0",
+    "@types/webpack-env": "^1.13.6",
+    "babel-preset-taro": "4.1.11",
+    "postcss": "^8.5.6",
+    "react-refresh": "^0.14.0",
+    "sass": "^1.75.0",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5.4.5",
+    "webpack": "5.91.0"
+  }
+}
