@@ -164,6 +164,7 @@ export default function BookingsPage() {
                 >
                   <View className='form-field__picker'>
                     <Text className='form-field__picker-text'>{form.date}</Text>
+                    <Text className='form-field__picker-arrow'>▾</Text>
                   </View>
                 </Picker>
               </View>
@@ -178,6 +179,7 @@ export default function BookingsPage() {
                 >
                   <View className='form-field__picker'>
                     <Text className='form-field__picker-text'>{form.startTime}</Text>
+                    <Text className='form-field__picker-arrow'>▾</Text>
                   </View>
                 </Picker>
               </View>
@@ -192,6 +194,7 @@ export default function BookingsPage() {
                 >
                   <View className='form-field__picker'>
                     <Text className='form-field__picker-text'>{form.endTime}</Text>
+                    <Text className='form-field__picker-arrow'>▾</Text>
                   </View>
                 </Picker>
               </View>
