@@ -1,111 +1,207 @@
-.time-grid {
-  position: relative;
-  margin-left: 0;
+.time-axis {
+  padding: 0 8px;
 
   &--empty {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 120px 0;
-    height: auto !important;
   }
 
   &__empty-text {
     font-size: 28px;
     color: var(--color-text-muted);
   }
+}
 
-  // ===== Hour grid lines =====
-  &__hour {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 0;
-    display: flex;
-    align-items: center;
-  }
+// ===== Time Row =====
+.time-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  animation: blockFadeIn 0.3s ease both;
 
-  &__hour-label {
-    width: 84px;
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    text-align: right;
-    padding-right: 16px;
-    font-variant-numeric: tabular-nums;
+  &__time {
+    width: 90px;
     flex-shrink: 0;
-  }
-
-  &__hour-line {
-    flex: 1;
-    height: 1px;
-    background: var(--color-border);
-  }
-
-  // ===== Event blocks =====
-  &__event {
-    position: absolute;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    transition: opacity 0.15s ease;
-    z-index: 5;
-
-    &:active {
-      opacity: 0.85;
-    }
-
-    &--booked {
-      background: var(--color-accent);
-      border-left: 4px solid var(--color-accent-dark);
-    }
-
-    &--blocked {
-      background: rgba(232, 84, 84, 0.2);
-      border-left: 4px solid var(--color-danger);
-    }
-
-    &--overlap {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    }
-  }
-
-  &__event-inner {
-    padding: 8px 12px;
-    height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    overflow: hidden;
+    align-items: flex-end;
+    padding-top: 18px;
+    gap: 4px;
   }
 
-  &__event-service {
-    font-size: 24px;
+  &__time-start {
+    font-size: 26px;
     font-weight: 700;
-    color: #0a0a0a;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    line-height: 1.3;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
   }
 
-  &__event-customer {
-    font-size: 20px;
-    font-weight: 500;
-    color: rgba(10, 10, 10, 0.7);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__event-time {
-    font-size: 20px;
-    color: rgba(10, 10, 10, 0.5);
-    margin-top: auto;
-  }
-
-  &__event-blocked-label {
+  &__time-end {
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 500;
+    color: var(--color-border);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // ===== Overlap layout =====
+  &__overlap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__overlap-tag {
+    display: inline-flex;
+    padding: 4px 16px;
+    border-radius: var(--radius-full);
+    background: rgba(232, 84, 84, 0.18);
+    margin-bottom: 12px;
+  }
+
+  &__overlap-text {
+    font-size: 20px;
+    font-weight: 700;
     color: var(--color-danger);
+  }
+
+  &__overlap-cards {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__overlap-card {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// ===== Block Card =====
+.block-card {
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--available {
+    background: var(--color-bg-card);
+    border: 1px dashed var(--color-border);
+  }
+
+  &--booked {
+    background: var(--color-bg-card);
+    border-left: 4px solid var(--color-accent);
+  }
+
+  &--blocked {
+    background: rgba(232, 84, 84, 0.06);
+    border: 1px solid rgba(232, 84, 84, 0.15);
+  }
+
+  &__label {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  &__label--blocked {
+    color: var(--color-danger);
+    opacity: 0.8;
+  }
+
+  &__arrow {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    margin-top: -16px;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--color-accent);
+    opacity: 0.6;
+  }
+
+  &__service {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__customer {
+    font-size: 22px;
+    color: var(--color-text-secondary);
+  }
+
+  &__time-range {
+    font-size: 22px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  &__reason {
+    font-size: 22px;
+    color: var(--color-text-muted);
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    margin-top: 4px;
+  }
+
+  &__badge--confirmed {
+    background: rgba(74, 222, 128, 0.15);
+
+    .block-card__badge-text {
+      color: var(--color-success);
+    }
+  }
+
+  &__badge--pending {
+    background: var(--color-accent-light);
+
+    .block-card__badge-text {
+      color: var(--color-accent);
+    }
+  }
+
+  &__badge-text {
+    font-size: 20px;
+    font-weight: 700;
+  }
+}
+
+// Overlap cards get red left border
+.time-row__overlap-card .block-card--booked {
+  border-left-color: var(--color-danger);
+}
+
+// ===== Animation =====
+@keyframes blockFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

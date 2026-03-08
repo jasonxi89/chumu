@@ -128,8 +128,6 @@ export default function CalendarPage() {
           date={selectedDate}
           rows={rows}
           onBlockTap={handleBlockTap}
-          dayStart={settings?.business_hours.start}
-          dayEnd={settings?.business_hours.end}
         />
         <View className='calendar-page__timeline-bottom' />
       </ScrollView>
