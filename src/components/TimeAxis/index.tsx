@@ -2,6 +2,13 @@ import { View, Text } from '@tarojs/components'
 import { TimeBlock, TimeRow } from '@/types'
 import './index.scss'
 
+const PX_PER_HOUR = 120
+
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(':').map(Number)
+  return h * 60 + m
+}
+
 interface TimeAxisProps {
   date: string
   rows: TimeRow[]
@@ -37,25 +44,52 @@ export default function TimeAxis({ date, rows, onBlockTap }: TimeAxisProps) {
               <BlockCard block={row.blocks[0]} />
             </View>
           ) : (
-            <View className='time-row__overlap'>
-              <View className='time-row__overlap-tag'>
-                <Text className='time-row__overlap-text'>时间冲突</Text>
-              </View>
-              <View className='time-row__overlap-cards'>
-                {row.blocks.map((block, i) => (
-                  <View
-                    key={`${block.startTime}-${i}`}
-                    className='time-row__overlap-card'
-                    onClick={(e) => { e.stopPropagation(); onBlockTap(block) }}
-                  >
-                    <BlockCard block={block} compact />
-                  </View>
-                ))}
-              </View>
-            </View>
+            <OverlapGroup row={row} onBlockTap={onBlockTap} />
           )}
         </View>
       ))}
+    </View>
+  )
+}
+
+function OverlapGroup({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlock) => void }) {
+  const groupStartMin = timeToMinutes(row.startTime)
+  const groupEndMin = timeToMinutes(row.endTime)
+  const groupDuration = groupEndMin - groupStartMin
+  const containerHeight = (groupDuration / 60) * PX_PER_HOUR
+
+  return (
+    <View className='time-row__overlap'>
+      <View className='time-row__overlap-tag'>
+        <Text className='time-row__overlap-text'>时间冲突</Text>
+      </View>
+      <View className='time-row__overlap-area' style={{ height: `${containerHeight}px` }}>
+        {row.blocks.map((block, i) => {
+          const blockStartMin = timeToMinutes(block.startTime)
+          const blockEndMin = timeToMinutes(block.endTime)
+          const top = ((blockStartMin - groupStartMin) / groupDuration) * 100
+          const height = ((blockEndMin - blockStartMin) / groupDuration) * 100
+          const colWidth = 100 / row.blocks.length
+          const left = i * colWidth
+
+          return (
+            <View
+              key={`${block.startTime}-${i}`}
+              className='time-row__overlap-card'
+              style={{
+                position: 'absolute',
+                top: `${top}%`,
+                height: `${height}%`,
+                left: `${left}%`,
+                width: `${colWidth - 2}%`,
+              }}
+              onClick={(e) => { e.stopPropagation(); onBlockTap(block) }}
+            >
+              <BlockCard block={block} compact />
+            </View>
+          )
+        })}
+      </View>
     </View>
   )
 }
