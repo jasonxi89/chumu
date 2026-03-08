@@ -154,6 +154,7 @@ export default function BookingsPage() {
             </View>
 
             <ScrollView scrollY className='sheet__body' enhanced showScrollbar={false}>
+              <View className='sheet__body-inner'>
               {/* Date */}
               <View className='form-field'>
                 <Text className='form-field__label'>日期</Text>
@@ -277,6 +278,7 @@ export default function BookingsPage() {
 
               {/* Bottom safe area */}
               <View style={{ height: '60px' }} />
+              </View>
             </ScrollView>
           </View>
         </View>

@@ -1,3 +1,8 @@
+// 微信小程序不支持 * 选择器，逐个声明 box-sizing
+view, text, image, input, textarea, picker, scroll-view, swiper {
+  box-sizing: border-box;
+}
+
 // Design Tokens
 page {
   --color-bg: #0f172a;
