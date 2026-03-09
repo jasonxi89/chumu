@@ -2,13 +2,6 @@ import { View, Text } from '@tarojs/components'
 import { TimeBlock, TimeRow } from '@/types'
 import './index.scss'
 
-const PX_PER_HOUR = 120
-
-function timeToMinutes(t: string): number {
-  const [h, m] = t.split(':').map(Number)
-  return h * 60 + m
-}
-
 interface TimeAxisProps {
   date: string
   rows: TimeRow[]
@@ -53,43 +46,78 @@ export default function TimeAxis({ date, rows, onBlockTap }: TimeAxisProps) {
 }
 
 function OverlapGroup({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlock) => void }) {
-  const groupStartMin = timeToMinutes(row.startTime)
-  const groupEndMin = timeToMinutes(row.endTime)
-  const groupDuration = groupEndMin - groupStartMin
-  const containerHeight = (groupDuration / 60) * PX_PER_HOUR
+  // Find overlap boundaries
+  const overlapStart = row.blocks.reduce((max, b) => b.startTime > max ? b.startTime : max, '00:00')
+  const overlapEnd = row.blocks.reduce((min, b) => b.endTime < min ? b.endTime : min, '99:99')
+
+  const beforeBlocks = row.blocks.filter(b => b.startTime < overlapStart)
+  const afterBlocks = row.blocks.filter(b => b.endTime > overlapEnd)
 
   return (
     <View className='time-row__overlap'>
-      <View className='time-row__overlap-tag'>
-        <Text className='time-row__overlap-text'>时间冲突</Text>
-      </View>
-      <View className='time-row__overlap-area' style={{ height: `${containerHeight}px` }}>
-        {row.blocks.map((block, i) => {
-          const blockStartMin = timeToMinutes(block.startTime)
-          const blockEndMin = timeToMinutes(block.endTime)
-          const top = ((blockStartMin - groupStartMin) / groupDuration) * 100
-          const height = ((blockEndMin - blockStartMin) / groupDuration) * 100
-          const colWidth = 100 / row.blocks.length
-          const left = i * colWidth
+      {/* Section 1: Before overlap — only the earlier-starting block */}
+      {beforeBlocks.length > 0 && (
+        <View className='overlap-section'>
+          <View className='overlap-section__time'>
+            <Text className='overlap-section__time-text'>
+              {row.startTime}
+            </Text>
+          </View>
+          <View className='overlap-section__cards'>
+            {beforeBlocks.map((block, i) => (
+              <View
+                key={`before-${i}`}
+                className='overlap-section__card overlap-section__card--half'
+                onClick={(e) => { e.stopPropagation(); onBlockTap(block) }}
+              >
+                <BlockCard block={block} compact />
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
 
-          return (
+      {/* Section 2: Overlap zone — side by side, red time labels */}
+      <View className='overlap-section overlap-section--conflict'>
+        <View className='overlap-section__time'>
+          <Text className='overlap-section__time-text overlap-section__time-text--danger'>
+            {overlapStart}
+          </Text>
+        </View>
+        <View className='overlap-section__cards'>
+          {row.blocks.map((block, i) => (
             <View
-              key={`${block.startTime}-${i}`}
-              className='time-row__overlap-card'
-              style={{
-                position: 'absolute',
-                top: `${top}%`,
-                height: `${height}%`,
-                left: `${left}%`,
-                width: `${colWidth - 2}%`,
-              }}
+              key={`overlap-${i}`}
+              className='overlap-section__card'
               onClick={(e) => { e.stopPropagation(); onBlockTap(block) }}
             >
               <BlockCard block={block} compact />
             </View>
-          )
-        })}
+          ))}
+        </View>
       </View>
+
+      {/* Section 3: After overlap — only the later-ending block */}
+      {afterBlocks.length > 0 && (
+        <View className='overlap-section'>
+          <View className='overlap-section__time'>
+            <Text className='overlap-section__time-text overlap-section__time-text--danger'>
+              {overlapEnd}
+            </Text>
+          </View>
+          <View className='overlap-section__cards'>
+            {afterBlocks.map((block, i) => (
+              <View
+                key={`after-${i}`}
+                className='overlap-section__card overlap-section__card--half-right'
+                onClick={(e) => { e.stopPropagation(); onBlockTap(block) }}
+              >
+                <BlockCard block={block} compact />
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
     </View>
   )
 }

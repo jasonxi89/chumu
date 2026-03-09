@@ -50,33 +50,48 @@
     min-width: 0;
   }
 
-  // ===== Overlap layout =====
   &__overlap {
     flex: 1;
     min-width: 0;
   }
+}
 
-  &__overlap-tag {
-    display: inline-flex;
-    padding: 4px 16px;
-    border-radius: var(--radius-full);
-    background: rgba(232, 84, 84, 0.18);
-    margin-bottom: 12px;
+// ===== Overlap Sections =====
+.overlap-section {
+  margin-bottom: 4px;
+
+  &__time {
+    margin-bottom: 4px;
   }
 
-  &__overlap-text {
+  &__time-text {
     font-size: 20px;
-    font-weight: 700;
-    color: var(--color-danger);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+
+    &--danger {
+      color: var(--color-danger);
+    }
   }
 
-  &__overlap-area {
-    position: relative;
-    width: 100%;
+  &__cards {
+    display: flex;
+    gap: 10px;
   }
 
-  &__overlap-card {
-    overflow: hidden;
+  &__card {
+    flex: 1;
+    min-width: 0;
+
+    &--half {
+      flex: 0 0 48%;
+    }
+
+    &--half-right {
+      flex: 0 0 48%;
+      margin-left: auto;
+    }
   }
 }
 
@@ -85,7 +100,6 @@
   border-radius: var(--radius-md);
   padding: 18px 20px;
   min-height: 76px;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -188,11 +202,6 @@
     font-size: 20px;
     font-weight: 700;
   }
-}
-
-// Overlap cards get red left border
-.time-row__overlap-card .block-card--booked {
-  border-left-color: var(--color-danger);
 }
 
 // ===== Animation =====
