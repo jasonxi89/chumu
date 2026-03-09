@@ -79,6 +79,7 @@ function OverlapRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlo
   const blockHeight = UNIT_HEIGHT
 
   // Time labels at card boundaries
+  // Don't include the group's end time — the next row will show it
   const timeLabels: { time: string; topPx: number; isDanger: boolean }[] = []
   sorted.forEach((block, i) => {
     const topPx = i * overlapOffset * UNIT_HEIGHT
@@ -88,7 +89,8 @@ function OverlapRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlo
       const isDanger = block.startTime === overlapStart || block.startTime === overlapEnd
       timeLabels.push({ time: block.startTime, topPx, isDanger })
     }
-    if (!timeLabels.find(l => l.time === block.endTime)) {
+    // Only show end time if it's a conflict boundary AND not the group's final end
+    if (block.endTime !== row.endTime && !timeLabels.find(l => l.time === block.endTime)) {
       const isDanger = block.endTime === overlapStart || block.endTime === overlapEnd
       timeLabels.push({ time: block.endTime, topPx: bottomPx, isDanger })
     }
