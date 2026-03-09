@@ -82,11 +82,9 @@ export default function ServiceItem({ service, onToggle, onDelete, onEdit }: Ser
             <Text className='service-item__name'>{service.name}</Text>
           </View>
           <View className='service-item__durations'>
-            {service.duration_options.map(dur => (
-              <View key={dur} className='service-item__chip'>
-                <Text className='service-item__chip-text'>{formatDuration(dur)}</Text>
-              </View>
-            ))}
+            <View className='service-item__chip'>
+              <Text className='service-item__chip-text'>{formatDuration(service.duration)}</Text>
+            </View>
           </View>
         </View>
         <View className='service-item__right' onClick={e => e.stopPropagation()}>

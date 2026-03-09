@@ -1,7 +1,7 @@
 export interface Service {
   _id?: string
   name: string
-  duration_options: number[]
+  duration: number
   color: string
   is_active: boolean
   created_at: Date

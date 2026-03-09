@@ -21,13 +21,13 @@ const DURATION_OPTIONS = [15, 30, 45, 60, 90, 120]
 interface ServiceFormData {
   name: string
   color: string
-  duration_options: number[]
+  duration: number
 }
 
 const EMPTY_FORM: ServiceFormData = {
   name: '',
   color: '#e8a838',
-  duration_options: [30],
+  duration: 60,
 }
 
 export default function SettingsPage() {
@@ -70,7 +70,7 @@ export default function SettingsPage() {
     setFormData({
       name: service.name,
       color: service.color,
-      duration_options: [...service.duration_options],
+      duration: service.duration,
     })
   }
 
@@ -80,15 +80,8 @@ export default function SettingsPage() {
     setFormData(EMPTY_FORM)
   }
 
-  function handleToggleDuration(duration: number) {
-    setFormData(prev => {
-      const hasIt = prev.duration_options.includes(duration)
-      if (hasIt && prev.duration_options.length === 1) return prev
-      const next = hasIt
-        ? prev.duration_options.filter(d => d !== duration)
-        : [...prev.duration_options, duration].sort((a, b) => a - b)
-      return { ...prev, duration_options: next }
-    })
+  function handleSelectDuration(duration: number) {
+    setFormData(prev => ({ ...prev, duration }))
   }
 
   function handleSaveForm() {
@@ -97,11 +90,6 @@ export default function SettingsPage() {
       Taro.showToast({ title: '请输入服务名称', icon: 'none' })
       return
     }
-    if (formData.duration_options.length === 0) {
-      Taro.showToast({ title: '请至少选择一个时长', icon: 'none' })
-      return
-    }
-
     if (editingId) {
       const existing = services.find(s => s._id === editingId)
       if (existing) {
@@ -109,14 +97,14 @@ export default function SettingsPage() {
           ...existing,
           name: trimmedName,
           color: formData.color,
-          duration_options: formData.duration_options,
+          duration: formData.duration,
         })
       }
     } else {
       addService({
         name: trimmedName,
         color: formData.color,
-        duration_options: formData.duration_options,
+        duration: formData.duration,
         is_active: true,
       })
     }
@@ -229,15 +217,15 @@ export default function SettingsPage() {
               </View>
 
               <View className='service-form__field'>
-                <Text className='service-form__label'>时长选项</Text>
+                <Text className='service-form__label'>时长</Text>
                 <View className='duration-chips'>
                   {DURATION_OPTIONS.map(dur => {
-                    const isSelected = formData.duration_options.includes(dur)
+                    const isSelected = formData.duration === dur
                     return (
                       <View
                         key={dur}
                         className={`duration-chips__item ${isSelected ? 'duration-chips__item--selected' : ''}`}
-                        onClick={() => handleToggleDuration(dur)}
+                        onClick={() => handleSelectDuration(dur)}
                       >
                         <Text className={`duration-chips__text ${isSelected ? 'duration-chips__text--selected' : ''}`}>
                           {formatDuration(dur)}

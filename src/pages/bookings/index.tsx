@@ -5,8 +5,9 @@ import FilterTabs from '@/components/FilterTabs'
 import BookingCard from '@/components/BookingCard'
 import EmptyState from '@/components/EmptyState'
 import { useBookings } from '@/hooks/useBookings'
+import { useServices } from '@/hooks/useServices'
 import { Booking } from '@/types'
-import { formatDate, parseDate } from '@/utils/time'
+import { formatDate, parseDate, addMinutes } from '@/utils/time'
 import './index.scss'
 
 const FILTER_TABS = [
@@ -22,7 +23,7 @@ interface BookingForm {
   date: string
   startTime: string
   endTime: string
-  serviceType: string
+  serviceIndex: number
   customerName: string
   customerPhone: string
   customerWechat: string
@@ -33,7 +34,7 @@ const INITIAL_FORM: BookingForm = {
   date: formatDate(new Date()),
   startTime: '10:00',
   endTime: '11:00',
-  serviceType: '',
+  serviceIndex: 0,
   customerName: '',
   customerPhone: '',
   customerWechat: '',
@@ -47,6 +48,9 @@ export default function BookingsPage() {
   const { bookings, loading, refresh, confirmBooking, cancelBooking, addBooking } = useBookings(
     filter as 'all' | 'pending' | 'confirmed' | 'cancelled'
   )
+  const { services } = useServices()
+  const activeServices = services.filter(s => s.is_active)
+  const serviceNames = activeServices.map(s => s.name)
 
   usePullDownRefresh(async () => {
     await refresh()
@@ -87,12 +91,13 @@ export default function BookingsPage() {
       return
     }
 
+    const selectedService = activeServices[form.serviceIndex]
     addBooking({
       date: form.date,
       start_time: form.startTime,
       duration,
-      service_type: form.serviceType || 'general',
-      service_name: form.serviceType || '通用服务',
+      service_type: selectedService?._id || 'general',
+      service_name: selectedService?.name || '通用服务',
       customer_name: form.customerName.trim(),
       customer_phone: form.customerPhone.trim() || undefined,
       customer_wechat: form.customerWechat.trim() || undefined,
@@ -105,6 +110,22 @@ export default function BookingsPage() {
 
   function updateField<K extends keyof BookingForm>(key: K, value: BookingForm[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
+  }
+
+  function handleServiceChange(index: number) {
+    const service = activeServices[index]
+    setForm(prev => {
+      const endTime = service ? addMinutes(prev.startTime, service.duration) : prev.endTime
+      return { ...prev, serviceIndex: index, endTime }
+    })
+  }
+
+  function handleStartTimeChange(startTime: string) {
+    const service = activeServices[form.serviceIndex]
+    setForm(prev => {
+      const endTime = service ? addMinutes(startTime, service.duration) : prev.endTime
+      return { ...prev, startTime, endTime }
+    })
   }
 
   return (
@@ -186,13 +207,31 @@ export default function BookingsPage() {
                 </Picker>
               </View>
 
+              {/* Service type */}
+              <View className='form-field'>
+                <Text className='form-field__label'>服务类型</Text>
+                <Picker
+                  mode='selector'
+                  range={serviceNames}
+                  value={form.serviceIndex}
+                  onChange={(e) => handleServiceChange(Number(e.detail.value))}
+                >
+                  <View className='form-field__picker'>
+                    <Text className='form-field__picker-text'>
+                      {activeServices[form.serviceIndex]?.name || '请选择'}
+                    </Text>
+                    <Text className='form-field__picker-arrow'>▾</Text>
+                  </View>
+                </Picker>
+              </View>
+
               {/* Start time */}
               <View className='form-field'>
                 <Text className='form-field__label'>开始时间</Text>
                 <Picker
                   mode='time'
                   value={form.startTime}
-                  onChange={(e) => updateField('startTime', e.detail.value)}
+                  onChange={(e) => handleStartTimeChange(e.detail.value)}
                 >
                   <View className='form-field__picker'>
                     <Text className='form-field__picker-text'>{form.startTime}</Text>
@@ -214,20 +253,6 @@ export default function BookingsPage() {
                     <Text className='form-field__picker-arrow'>▾</Text>
                   </View>
                 </Picker>
-              </View>
-
-              {/* Service type */}
-              <View className='form-field'>
-                <Text className='form-field__label'>服务类型</Text>
-                <View className='form-field__input-wrap'>
-                  <Input
-                    className='form-field__input'
-                    value={form.serviceType}
-                    placeholder='如：面部护理、美甲设计'
-                    placeholderClass='form-field__placeholder'
-                    onInput={(e) => updateField('serviceType', e.detail.value)}
-                  />
-                </View>
               </View>
 
               {/* Customer name */}
