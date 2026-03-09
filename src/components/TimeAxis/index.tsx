@@ -63,64 +63,54 @@ function OverlapRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlo
   const overlapStart = row.blocks.reduce((max, b) => b.startTime > max ? b.startTime : max, '00:00')
   const overlapEnd = row.blocks.reduce((min, b) => b.endTime < min ? b.endTime : min, '99:99')
 
-  const groupStartMin = timeToMinutes(row.startTime)
-  const groupEndMin = timeToMinutes(row.endTime)
-  const groupDuration = groupEndMin - groupStartMin
-
-  // Each block height = 2 units, overlap = 1 unit
-  // Total container height: block1 unique + overlap + block2 unique
-  // With 2 blocks: total = 2 + 2 - 1 = 3 units
-  const totalUnits = row.blocks.length + 1
-  const containerHeight = totalUnits * UNIT_HEIGHT
-
-  // Collect all time boundaries for left column labels
-  const timeLabels: { time: string; top: number; isDanger: boolean }[] = []
-
   // Sort blocks by start time
   const sorted = [...row.blocks].sort((a, b) => a.startTime.localeCompare(b.startTime))
+  const n = sorted.length
 
+  // Equal height layout: each card = 2 units, overlap = 1 unit
+  // For 2 cards: total = 3 units (card1: 0-2, card2: 1-3)
+  // For 3 cards: total = 4 units (card1: 0-2, card2: 1-3, card3: 2-4)
+  const totalUnits = n + 1
+  const blockUnits = 2
+  const containerHeight = totalUnits * UNIT_HEIGHT
+  const blockHeight = blockUnits * UNIT_HEIGHT
+
+  // Time labels at card boundaries
+  const timeLabels: { time: string; topUnit: number; isDanger: boolean }[] = []
   sorted.forEach((block, i) => {
-    const blockStartMin = timeToMinutes(block.startTime)
-    const blockEndMin = timeToMinutes(block.endTime)
-    const top = ((blockStartMin - groupStartMin) / groupDuration) * containerHeight
-    const bottom = ((blockEndMin - groupStartMin) / groupDuration) * containerHeight
+    const topUnit = i
+    const bottomUnit = i + blockUnits
 
-    // Start time label
-    const isStartConflict = block.startTime === overlapStart || block.startTime === overlapEnd
     if (!timeLabels.find(l => l.time === block.startTime)) {
-      timeLabels.push({ time: block.startTime, top, isDanger: isStartConflict })
+      const isDanger = block.startTime === overlapStart || block.startTime === overlapEnd
+      timeLabels.push({ time: block.startTime, topUnit, isDanger })
     }
-
-    // End time label
-    const isEndConflict = block.endTime === overlapStart || block.endTime === overlapEnd
     if (!timeLabels.find(l => l.time === block.endTime)) {
-      timeLabels.push({ time: block.endTime, top: bottom, isDanger: isEndConflict })
+      const isDanger = block.endTime === overlapStart || block.endTime === overlapEnd
+      timeLabels.push({ time: block.endTime, topUnit: bottomUnit, isDanger })
     }
   })
 
   return (
     <View className='time-row'>
-      {/* Left: time labels absolutely positioned */}
+      {/* Left: time labels */}
       <View className='time-row__time time-row__time--overlap' style={{ height: `${containerHeight}px` }}>
         {timeLabels.map(label => (
           <Text
             key={label.time}
             className={`time-row__time-abs ${label.isDanger ? 'time-row__time-abs--danger' : ''}`}
-            style={{ top: `${label.top}px` }}
+            style={{ top: `${label.topUnit * UNIT_HEIGHT}px` }}
           >
             {label.time}
           </Text>
         ))}
       </View>
 
-      {/* Right: cards absolutely positioned */}
+      {/* Right: cards, each same height, staggered by 1 unit */}
       <View className='time-row__overlap-area' style={{ height: `${containerHeight}px` }}>
         {sorted.map((block, i) => {
-          const blockStartMin = timeToMinutes(block.startTime)
-          const blockEndMin = timeToMinutes(block.endTime)
-          const top = ((blockStartMin - groupStartMin) / groupDuration) * containerHeight
-          const height = ((blockEndMin - blockStartMin) / groupDuration) * containerHeight
-          const colWidth = 100 / row.blocks.length
+          const top = i * UNIT_HEIGHT
+          const colWidth = 100 / n
           const left = i * colWidth
 
           return (
@@ -130,7 +120,7 @@ function OverlapRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlo
               style={{
                 position: 'absolute',
                 top: `${top}px`,
-                height: `${height}px`,
+                height: `${blockHeight}px`,
                 left: `${left}%`,
                 width: `${colWidth - 1}%`,
               }}
