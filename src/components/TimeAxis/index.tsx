@@ -2,7 +2,7 @@ import { View, Text } from '@tarojs/components'
 import { TimeBlock, TimeRow } from '@/types'
 import './index.scss'
 
-const UNIT_HEIGHT = 140 // px per "unit" block height
+const UNIT_HEIGHT = 160 // px per block (1 unit = 1 card height)
 
 function timeToMinutes(t: string): number {
   const [h, m] = t.split(':').map(Number)
@@ -26,29 +26,33 @@ export default function TimeAxis({ date, rows, onBlockTap }: TimeAxisProps) {
 
   return (
     <View className='time-axis'>
-      {rows.map((row, index) => (
-        <View
-          key={`${date}-${row.startTime}-${index}`}
-          style={{ animationDelay: `${index * 50}ms` }}
-          className='time-row-wrap'
-        >
-          {row.type === 'single' ? (
-            <SingleRow row={row} onBlockTap={onBlockTap} />
-          ) : (
-            <OverlapRow row={row} onBlockTap={onBlockTap} />
-          )}
-        </View>
-      ))}
+      {rows.map((row, index) => {
+        const prevRow = index > 0 ? rows[index - 1] : null
+        const hideStartTime = prevRow && prevRow.type === 'overlap' && row.startTime === prevRow.endTime
+        return (
+          <View
+            key={`${date}-${row.startTime}-${index}`}
+            style={{ animationDelay: `${index * 50}ms` }}
+            className='time-row-wrap'
+          >
+            {row.type === 'single' ? (
+              <SingleRow row={row} onBlockTap={onBlockTap} hideStartTime={!!hideStartTime} />
+            ) : (
+              <OverlapRow row={row} onBlockTap={onBlockTap} />
+            )}
+          </View>
+        )
+      })}
     </View>
   )
 }
 
-function SingleRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlock) => void }) {
+function SingleRow({ row, onBlockTap, hideStartTime }: { row: TimeRow; onBlockTap: (b: TimeBlock) => void; hideStartTime?: boolean }) {
   const block = row.blocks[0]
   return (
     <View className='time-row' onClick={() => onBlockTap(block)}>
       <View className='time-row__time'>
-        <Text className='time-row__time-start'>{row.startTime}</Text>
+        {!hideStartTime && <Text className='time-row__time-start'>{row.startTime}</Text>}
         <Text className='time-row__time-end'>{row.endTime}</Text>
       </View>
       <View className='time-row__content'>
@@ -67,27 +71,27 @@ function OverlapRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlo
   const sorted = [...row.blocks].sort((a, b) => a.startTime.localeCompare(b.startTime))
   const n = sorted.length
 
-  // Equal height layout: each card = 2 units, overlap = 1 unit
-  // For 2 cards: total = 3 units (card1: 0-2, card2: 1-3)
-  // For 3 cards: total = 4 units (card1: 0-2, card2: 1-3, card3: 2-4)
-  const totalUnits = n + 1
-  const blockUnits = 2
+  // Equal height layout: each card = 1 unit, overlap offset = 0.5 unit
+  // For 2 cards: total = 1.5 units (card1: 0-1, card2: 0.5-1.5)
+  // For 3 cards: total = 2 units (card1: 0-1, card2: 0.5-1.5, card3: 1-2)
+  const overlapOffset = 0.5
+  const totalUnits = 1 + (n - 1) * overlapOffset
   const containerHeight = totalUnits * UNIT_HEIGHT
-  const blockHeight = blockUnits * UNIT_HEIGHT
+  const blockHeight = UNIT_HEIGHT
 
   // Time labels at card boundaries
-  const timeLabels: { time: string; topUnit: number; isDanger: boolean }[] = []
+  const timeLabels: { time: string; topPx: number; isDanger: boolean }[] = []
   sorted.forEach((block, i) => {
-    const topUnit = i
-    const bottomUnit = i + blockUnits
+    const topPx = i * overlapOffset * UNIT_HEIGHT
+    const bottomPx = topPx + blockHeight
 
     if (!timeLabels.find(l => l.time === block.startTime)) {
       const isDanger = block.startTime === overlapStart || block.startTime === overlapEnd
-      timeLabels.push({ time: block.startTime, topUnit, isDanger })
+      timeLabels.push({ time: block.startTime, topPx, isDanger })
     }
     if (!timeLabels.find(l => l.time === block.endTime)) {
       const isDanger = block.endTime === overlapStart || block.endTime === overlapEnd
-      timeLabels.push({ time: block.endTime, topUnit: bottomUnit, isDanger })
+      timeLabels.push({ time: block.endTime, topPx: bottomPx, isDanger })
     }
   })
 
@@ -99,7 +103,7 @@ function OverlapRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlo
           <Text
             key={label.time}
             className={`time-row__time-abs ${label.isDanger ? 'time-row__time-abs--danger' : ''}`}
-            style={{ top: `${label.topUnit * UNIT_HEIGHT}px` }}
+            style={{ top: `${label.topPx}px` }}
           >
             {label.time}
           </Text>
@@ -109,7 +113,7 @@ function OverlapRow({ row, onBlockTap }: { row: TimeRow; onBlockTap: (b: TimeBlo
       {/* Right: cards, each same height, staggered by 1 unit */}
       <View className='time-row__overlap-area' style={{ height: `${containerHeight}px` }}>
         {sorted.map((block, i) => {
-          const top = i * UNIT_HEIGHT
+          const top = i * overlapOffset * UNIT_HEIGHT
           const colWidth = 100 / n
           const left = i * colWidth
 
