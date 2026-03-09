@@ -28,7 +28,7 @@ export default function TimeAxis({ date, rows, onBlockTap }: TimeAxisProps) {
     <View className='time-axis'>
       {rows.map((row, index) => {
         const prevRow = index > 0 ? rows[index - 1] : null
-        const hideStartTime = prevRow && row.startTime === prevRow.endTime
+        const hideStartTime = false
         return (
           <View
             key={`${date}-${row.startTime}-${index}`}
@@ -53,7 +53,6 @@ function SingleRow({ row, onBlockTap, hideStartTime }: { row: TimeRow; onBlockTa
     <View className='time-row' onClick={() => onBlockTap(block)}>
       <View className='time-row__time'>
         {!hideStartTime && <Text className='time-row__time-start'>{row.startTime}</Text>}
-        <Text className='time-row__time-end'>{row.endTime}</Text>
       </View>
       <View className='time-row__content'>
         <BlockCard block={block} />
