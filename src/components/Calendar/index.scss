@@ -102,7 +102,7 @@
 
 .calendar-cell__inner--selected {
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
-  box-shadow: 0 4px 20px rgba(232, 168, 56, 0.4);
+  box-shadow: var(--shadow-glow);
 }
 
 .calendar-cell__number {

@@ -6,7 +6,7 @@ const STORAGE_KEY = 'chumu_theme'
 
 export function useTheme() {
   const [themeKey, setThemeKey] = useState(() => {
-    return Taro.getStorageSync(STORAGE_KEY) || 'ink-gold'
+    return Taro.getStorageSync(STORAGE_KEY) || 'peach'
   })
 
   const theme = getTheme(themeKey)
