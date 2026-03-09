@@ -4,7 +4,7 @@ import { getCollection } from '@/utils/cloud'
 
 const DEFAULT_SETTINGS: Settings = {
   owner_openid: '',
-  business_hours: { start: '09:00', end: '18:00' },
+  business_hours: { start: '00:00', end: '24:00' },
   time_slot_interval: 30,
 }
 
