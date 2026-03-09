@@ -217,7 +217,7 @@ export default function SettingsPage() {
               </View>
 
               <View className='service-form__field'>
-                <Text className='service-form__label'>时长</Text>
+                <Text className='service-form__label'>大概时长</Text>
                 <View className='duration-chips'>
                   {DURATION_OPTIONS.map(dur => {
                     const isSelected = formData.duration === dur
