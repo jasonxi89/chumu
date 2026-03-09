@@ -9,11 +9,13 @@ import { useCalendarData } from '@/hooks/useCalendarData'
 import { useDaySlots } from '@/hooks/useDaySlots'
 import { formatDate } from '@/utils/time'
 import { TimeBlock } from '@/types'
+import { useTheme } from '@/hooks/useTheme'
 import './index.scss'
 
 const WEEKDAY_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
 export default function CalendarPage() {
+  const { themeStyle } = useTheme()
   const today = useMemo(() => new Date(), [])
   const [selectedDate, setSelectedDate] = useState(formatDate(today))
   const [currentMonth, setCurrentMonth] = useState(
@@ -101,7 +103,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <View className='calendar-page'>
+    <View className='calendar-page' style={themeStyle}>
       <Calendar
         selectedDate={selectedDate}
         onDateSelect={setSelectedDate}

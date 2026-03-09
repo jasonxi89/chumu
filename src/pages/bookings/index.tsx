@@ -8,6 +8,7 @@ import { useBookings } from '@/hooks/useBookings'
 import { useServices } from '@/hooks/useServices'
 import { Booking } from '@/types'
 import { formatDate, parseDate, addMinutes } from '@/utils/time'
+import { useTheme } from '@/hooks/useTheme'
 import './index.scss'
 
 const FILTER_TABS = [
@@ -42,6 +43,7 @@ const INITIAL_FORM: BookingForm = {
 }
 
 export default function BookingsPage() {
+  const { themeStyle } = useTheme()
   const [filter, setFilter] = useState('all')
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [form, setForm] = useState<BookingForm>({ ...INITIAL_FORM })
@@ -129,7 +131,7 @@ export default function BookingsPage() {
   }
 
   return (
-    <View className='bookings-page'>
+    <View className='bookings-page' style={themeStyle}>
       {/* Header */}
       <View className='bookings-page__header'>
         <Text className='bookings-page__title'>预约列表</Text>

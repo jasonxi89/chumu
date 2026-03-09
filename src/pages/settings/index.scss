@@ -331,6 +331,54 @@
   }
 }
 
+// --- Theme Selector ---
+.theme-selector {
+  display: flex;
+  gap: 24px;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__preview {
+    width: 100px;
+    height: 100px;
+    border-radius: var(--radius-lg);
+    border: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.25s ease, transform 0.2s ease;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &__item--active &__preview {
+    border-width: 3px;
+  }
+
+  &__dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  &__name {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  &__name--active {
+    color: var(--color-accent);
+  }
+}
+
 // --- About ---
 .about {
   &__name {

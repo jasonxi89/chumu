@@ -7,6 +7,7 @@ import { useSettings } from '@/hooks/useSettings'
 import { useServices } from '@/hooks/useServices'
 import ServiceItem from '@/components/ServiceItem'
 import { APP_VERSION } from '@/utils/version'
+import { useTheme } from '@/hooks/useTheme'
 import './index.scss'
 
 const INTERVAL_OPTIONS = [15, 30, 60]
@@ -34,6 +35,7 @@ const EMPTY_FORM: ServiceFormData = {
 export default function SettingsPage() {
   const { settings, updateSettings } = useSettings()
   const { services, addService, updateService, toggleService, deleteService } = useServices()
+  const { themeKey, themeStyle, switchTheme, themes } = useTheme()
 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isAdding, setIsAdding] = useState(false)
@@ -128,7 +130,7 @@ export default function SettingsPage() {
   if (!settings) return <View className='settings-page' />
 
   return (
-    <ScrollView scrollY className='settings-page' enhanced showScrollbar={false}>
+    <ScrollView scrollY className='settings-page' enhanced showScrollbar={false} style={themeStyle}>
       <View className='settings-page__inner'>
         {/* Section: Business Hours */}
         <View className='section'>
@@ -270,6 +272,36 @@ export default function SettingsPage() {
               </View>
             )
           )}
+        </View>
+
+        {/* Section: Theme */}
+        <View className='section'>
+          <Text className='section__title'>主题风格</Text>
+          <View className='theme-selector'>
+            {themes.map(t => (
+              <View
+                key={t.key}
+                className={`theme-selector__item ${themeKey === t.key ? 'theme-selector__item--active' : ''}`}
+                onClick={() => switchTheme(t.key)}
+              >
+                <View
+                  className='theme-selector__preview'
+                  style={{
+                    backgroundColor: t.vars['--color-bg'],
+                    borderColor: themeKey === t.key ? t.vars['--color-accent'] : 'transparent',
+                  }}
+                >
+                  <View
+                    className='theme-selector__dot'
+                    style={{ backgroundColor: t.vars['--color-accent'] }}
+                  />
+                </View>
+                <Text className={`theme-selector__name ${themeKey === t.key ? 'theme-selector__name--active' : ''}`}>
+                  {t.name}
+                </Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* Section: About */}
