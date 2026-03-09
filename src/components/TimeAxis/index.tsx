@@ -28,7 +28,7 @@ export default function TimeAxis({ date, rows, onBlockTap }: TimeAxisProps) {
     <View className='time-axis'>
       {rows.map((row, index) => {
         const prevRow = index > 0 ? rows[index - 1] : null
-        const hideStartTime = prevRow && prevRow.type === 'overlap' && row.startTime === prevRow.endTime
+        const hideStartTime = prevRow && row.startTime === prevRow.endTime
         return (
           <View
             key={`${date}-${row.startTime}-${index}`}

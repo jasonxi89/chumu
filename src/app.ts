@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react'
 import { useLaunch } from '@tarojs/taro'
 import { initCloud } from './utils/cloud'
-const APP_VERSION = '0.4.8'
+const APP_VERSION = '0.4.9'
 import './app.scss'
 
 function App({ children }: PropsWithChildren) {
