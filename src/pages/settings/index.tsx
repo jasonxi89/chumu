@@ -6,6 +6,7 @@ import { formatDuration } from '@/utils/time'
 import { useSettings } from '@/hooks/useSettings'
 import { useServices } from '@/hooks/useServices'
 import ServiceItem from '@/components/ServiceItem'
+import { APP_VERSION } from '@/utils/version'
 import './index.scss'
 
 const INTERVAL_OPTIONS = [15, 30, 60]
@@ -273,7 +274,7 @@ export default function SettingsPage() {
 
         {/* Section: About */}
         <View className='section section--about'>
-          <Text className='about__name'>初慕 v0.1.0</Text>
+          <Text className='about__name'>初慕 v{APP_VERSION}</Text>
           <Text className='about__desc'>日历预约助手</Text>
         </View>
 
